@@ -17,6 +17,9 @@
 		4FEB02092C91E1610022E21D /* HistoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FEB02082C91E1610022E21D /* HistoryManager.swift */; };
 		4FEB020B2C91E17F0022E21D /* LoadingStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FEB020A2C91E17F0022E21D /* LoadingStateView.swift */; };
 		4FEB020D2C91FD050022E21D /* SearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FEB020C2C91FD050022E21D /* SearchBarView.swift */; };
+		4FEB02152C9231320022E21D /* SuggestionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FEB02142C9231320022E21D /* SuggestionsManager.swift */; };
+		4FEB02172C9232A70022E21D /* SearchViewController+UI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FEB02162C9232A70022E21D /* SearchViewController+UI.swift */; };
+		4FEB02192C9239B10022E21D /* CollectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FEB02182C9239B10022E21D /* CollectionManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +35,9 @@
 		4FEB02082C91E1610022E21D /* HistoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryManager.swift; sourceTree = "<group>"; };
 		4FEB020A2C91E17F0022E21D /* LoadingStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingStateView.swift; sourceTree = "<group>"; };
 		4FEB020C2C91FD050022E21D /* SearchBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBarView.swift; sourceTree = "<group>"; };
+		4FEB02142C9231320022E21D /* SuggestionsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionsManager.swift; sourceTree = "<group>"; };
+		4FEB02162C9232A70022E21D /* SearchViewController+UI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SearchViewController+UI.swift"; sourceTree = "<group>"; };
+		4FEB02182C9239B10022E21D /* CollectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +75,9 @@
 				4FEB01F32C90FC1E0022E21D /* Assets.xcassets */,
 				4FEB01F82C90FC1E0022E21D /* Info.plist */,
 				4FEB02002C91010A0022E21D /* SearchViewController.swift */,
+				4FEB02182C9239B10022E21D /* CollectionManager.swift */,
+				4FEB02142C9231320022E21D /* SuggestionsManager.swift */,
+				4FEB02162C9232A70022E21D /* SearchViewController+UI.swift */,
 				4FEB020C2C91FD050022E21D /* SearchBarView.swift */,
 				4FEB02022C9101230022E21D /* NetworkManager.swift */,
 				4FEB02062C91E1530022E21D /* UnsplashImage.swift */,
@@ -153,8 +162,11 @@
 				4FEB01EB2C90FC1C0022E21D /* AppDelegate.swift in Sources */,
 				4FEB02032C9101230022E21D /* NetworkManager.swift in Sources */,
 				4FEB02012C91010A0022E21D /* SearchViewController.swift in Sources */,
+				4FEB02172C9232A70022E21D /* SearchViewController+UI.swift in Sources */,
+				4FEB02152C9231320022E21D /* SuggestionsManager.swift in Sources */,
 				4FEB02092C91E1610022E21D /* HistoryManager.swift in Sources */,
 				4FEB01ED2C90FC1C0022E21D /* SceneDelegate.swift in Sources */,
+				4FEB02192C9239B10022E21D /* CollectionManager.swift in Sources */,
 				4FEB02052C9101330022E21D /* ImageCell.swift in Sources */,
 				4FEB02072C91E1530022E21D /* UnsplashImage.swift in Sources */,
 			);
