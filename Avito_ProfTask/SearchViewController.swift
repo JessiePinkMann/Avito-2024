@@ -10,36 +10,30 @@ import UIKit
 
 class SearchViewController: UIViewController, UISearchBarDelegate {
     
-    // UI Components
     var collectionView: UICollectionView!
-    var searchBarView: SearchBarView!  // Используем кастомный SearchBarView
+    var searchBarView: SearchBarView!
     var loadingStateView: LoadingStateView!
-    var suggestionsTableView: UITableView!  // Таблица для подсказок
+    var suggestionsTableView: UITableView!
     
-    // Data
     var images: [UnsplashImage] = []
     var currentPage = 1
     var isFetchingMore = false
-    var searchQuery: String? = nil  // По умолчанию пустой запрос
+    var searchQuery: String? = nil
     
-    // Manager
     var collectionManager: CollectionManager!
     var suggestionsManager: SuggestionsManager!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = UIColor(named: "primaryBackground")  // Устанавливаем задний фон
+        view.backgroundColor = UIColor(named: "primaryBackground")
         
-        setupSearchBarView()  // Настройка кастомного SearchBarView
+        setupSearchBarView()
         setupCollectionView()
         setupLoadingStateView()
-        setupSuggestionsTableView()  // Добавляем таблицу для подсказок
+        setupSuggestionsTableView()
         
-        // Инициализация SuggestionsManager
         suggestionsManager = SuggestionsManager(tableView: suggestionsTableView, searchBar: searchBarView.searchBar, parentVC: self)
-        
-        // Инициализация CollectionViewManager
         collectionManager = CollectionManager(images: images)
         collectionView.dataSource = collectionManager
         collectionView.delegate = collectionManager
@@ -48,7 +42,16 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
         
-        loadingStateView.hide()  // Скрываем состояние загрузки и ошибки при старте
+        loadingStateView.hide()
+        
+        // Добавляем кнопку переключения
+        let switchButton = UIBarButtonItem(title: "Switch Mode", style: .plain, target: self, action: #selector(toggleLayoutMode))
+        navigationItem.rightBarButtonItem = switchButton
+    }
+    
+    @objc private func toggleLayoutMode() {
+        collectionManager.toggleLayout()
+        collectionView.collectionViewLayout.invalidateLayout()  // Обновляем макет
     }
     
     // MARK: - UISearchBarDelegate
@@ -159,8 +162,17 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let padding: CGFloat = 10
-        let width = (view.frame.width - padding * 3) / 2
-        return CGSize(width: width, height: width)
+        let availableWidth = (collectionView.frame.width - padding * 3) / 2  // Два столбца
+        
+        // Высота изображения + фиксированная высота для описания и даты
+        let imageHeight = availableWidth  // Картинка квадратная
+        let descriptionHeight: CGFloat = 20  // Описание (одна строка)
+        let dateHeight: CGFloat = 18  // Дата (одна строка)
+        let totalHeight = imageHeight + descriptionHeight + dateHeight + 14  // 14 — отступы сверху и снизу
+        
+        return CGSize(width: availableWidth, height: totalHeight)
     }
+
+
         
 }

@@ -16,6 +16,7 @@ struct UnsplashImage: Decodable {
     let description: String?
     let urls: Urls
     let user: User
+    let created_at: String  // Добавляем поле даты
 }
 
 struct Urls: Decodable {

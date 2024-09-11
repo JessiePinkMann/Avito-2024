@@ -27,20 +27,20 @@ extension SearchViewController {
     
     func setupCollectionView() {
         let layout = UICollectionViewFlowLayout()
-        layout.minimumInteritemSpacing = 10
-        layout.minimumLineSpacing = 10
-        
+        layout.minimumInteritemSpacing = 5
+        layout.minimumLineSpacing = 5
+
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.dataSource = collectionManager  // Используем collectionViewManager как источник данных
+        collectionView.dataSource = collectionManager  // Используем collectionManager как dataSource
         collectionView.delegate = collectionManager
         collectionView.register(ImageCell.self, forCellWithReuseIdentifier: "ImageCell")
         collectionView.backgroundColor = .clear  // Делаем фон collectionView прозрачным
         view.addSubview(collectionView)
-        
-        // Constraints
+
+        // Убедитесь, что констрейнты для collectionView не конфликтуют
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: searchBarView.bottomAnchor),  // Привязываем к низу searchBarView
+            collectionView.topAnchor.constraint(equalTo: searchBarView.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
