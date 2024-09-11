@@ -70,8 +70,12 @@ class SearchBarView: UIView {
     // MARK: - Сброс поисковой строки и скрытие Cancel
 
     @objc func cancelButtonTapped() {
-        cancelSearch()  // Вызов метода сброса состояния
+        // Вызов метода отмены в контроллере
+        if let parentVC = parentViewController as? SearchViewController {
+            parentVC.cancelSearch()
+        }
     }
+
 
     func cancelSearch() {
         // Очистка текста и возврат к исходному состоянию
@@ -86,5 +90,18 @@ class SearchBarView: UIView {
         }
         
         searchBar.resignFirstResponder()  // Закрываем клавиатуру
+    }
+}
+
+extension UIView {
+    var parentViewController: UIViewController? {
+        var parentResponder: UIResponder? = self
+        while let nextResponder = parentResponder?.next {
+            parentResponder = nextResponder
+            if let viewController = parentResponder as? UIViewController {
+                return viewController
+            }
+        }
+        return nil
     }
 }
