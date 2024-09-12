@@ -18,14 +18,16 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
     var images: [UnsplashImage] = []
     var currentPage = 1
     var isFetchingMore = false
-    var searchQuery: String? = nil
+    var searchQuery: String? = nil  // Добавляем сюда свойство searchQuery
     
     var collectionManager: CollectionManager!
     var suggestionsManager: SuggestionsManager!
     
+    private let sortManager = SortManager()  // Менеджер сортировки
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         view.backgroundColor = UIColor(named: "primaryBackground")
         
         setupSearchBarView()
@@ -38,22 +40,43 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
         collectionView.dataSource = collectionManager
         collectionView.delegate = collectionManager
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        tapGesture.cancelsTouchesInView = false
-        view.addGestureRecognizer(tapGesture)
+        // Добавляем кнопку для сортировки через SortManager
+        let sortButton = sortManager.createSortButton(target: self)  // Передаем SearchViewController
+        navigationItem.rightBarButtonItem = sortButton
         
-        loadingStateView.hide()
-        
-        // Добавляем кнопку переключения
+        // Добавляем кнопку переключения режимов отображения
         let switchButton = UIBarButtonItem(title: "Switch Mode", style: .plain, target: self, action: #selector(toggleLayoutMode))
-        navigationItem.rightBarButtonItem = switchButton
+        navigationItem.leftBarButtonItem = switchButton
     }
     
-    // Метод переключения режимов
     @objc private func toggleLayoutMode() {
         collectionManager.toggleLayout()
         collectionView.collectionViewLayout.invalidateLayout()  // Обновляем макет
         collectionView.reloadData()
+    }
+    
+
+    
+    func performSearch(query: String, sortBy: String = "relevant") {
+        guard !isFetchingMore else { return }  // Не повторяем запрос, если идет загрузка данных
+        isFetchingMore = true
+        loadingStateView.showLoading()
+
+        NetworkManager.shared.searchImages(query: query, page: currentPage, sortBy: sortBy) { [weak self] result in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let images):
+                    self.images = images
+                    self.collectionManager.images = images
+                    self.collectionView.reloadData()
+                case .failure(let error):
+                    print("Error: \(error)")
+                }
+                self.isFetchingMore = false
+                self.loadingStateView.hide()
+            }
+        }
     }
     
     // MARK: - UISearchBarDelegate

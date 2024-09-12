@@ -12,7 +12,6 @@ enum NetworkError: Error {
     case requestFailed
     case decodingFailed
 }
-
 class NetworkManager {
     static let shared = NetworkManager()
 
@@ -21,17 +20,19 @@ class NetworkManager {
 
     private init() {}
 
-    func searchImages(query: String, page: Int = 1, completion: @escaping (Result<[UnsplashImage], NetworkError>) -> Void) {
+    // Добавляем параметр сортировки как строку
+    func searchImages(query: String, page: Int = 1, sortBy: String = "relevant", completion: @escaping (Result<[UnsplashImage], NetworkError>) -> Void) {
         guard var urlComponents = URLComponents(string: baseURL) else {
             completion(.failure(.invalidURL))
             return
         }
 
-        // Формируем параметры запроса
+        // Формируем параметры запроса с правильным параметром сортировки
         urlComponents.queryItems = [
             URLQueryItem(name: "query", value: query),
             URLQueryItem(name: "page", value: "\(page)"),
             URLQueryItem(name: "per_page", value: "30"),
+            URLQueryItem(name: "order_by", value: sortBy),  // Либо "relevant", либо "latest"
             URLQueryItem(name: "client_id", value: accessKey)
         ]
 
@@ -69,5 +70,3 @@ class NetworkManager {
         }.resume()
     }
 }
-
-
