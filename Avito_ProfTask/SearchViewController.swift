@@ -49,9 +49,11 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
         navigationItem.rightBarButtonItem = switchButton
     }
     
+    // Метод переключения режимов
     @objc private func toggleLayoutMode() {
         collectionManager.toggleLayout()
         collectionView.collectionViewLayout.invalidateLayout()  // Обновляем макет
+        collectionView.reloadData()
     }
     
     // MARK: - UISearchBarDelegate
@@ -153,26 +155,29 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ImageCell", for: indexPath) as? ImageCell else {
             return UICollectionViewCell()
         }
-        let image = images[indexPath.item]  // Получаем изображение по индексу
-        cell.configure(with: image)  // Конфигурируем ячейку с данными
+
+        let image = images[indexPath.item]
+        // Передаем режим отображения в ячейку через isGridMode
+        cell.configure(with: image, isSingleColumnMode: !collectionManager.isGridMode)
         return cell
     }
+
+
     
     // MARK: - UICollectionViewDelegateFlowLayout
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let padding: CGFloat = 10
-        let availableWidth = (collectionView.frame.width - padding * 3) / 2  // Два столбца
-        
-        // Высота изображения + фиксированная высота для описания и даты
-        let imageHeight = availableWidth  // Картинка квадратная
-        let descriptionHeight: CGFloat = 20  // Описание (одна строка)
-        let dateHeight: CGFloat = 18  // Дата (одна строка)
-        let totalHeight = imageHeight + descriptionHeight + dateHeight + 14  // 14 — отступы сверху и снизу
-        
-        return CGSize(width: availableWidth, height: totalHeight)
+
+        if collectionManager.isGridMode {  // Проверяем, включен ли режим сетки
+            // Режим двух плиток
+            let width = (view.frame.width - padding * 3) / 2
+            return CGSize(width: width, height: width)
+        } else {
+            // Устанавливаем одну плитку во всю ширину экрана с учётом отступов
+            let width = view.frame.width - padding * 2
+            let height = width * 0.75  // Примерное соотношение сторон
+            return CGSize(width: width, height: height)
+        }
     }
-
-
-        
 }

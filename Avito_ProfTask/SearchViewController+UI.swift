@@ -21,7 +21,7 @@ extension SearchViewController {
             searchBarView.topAnchor.constraint(equalTo: view.topAnchor),
             searchBarView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             searchBarView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            searchBarView.heightAnchor.constraint(equalToConstant: 150)
+            searchBarView.heightAnchor.constraint(equalToConstant: 160)
         ])
     }
     

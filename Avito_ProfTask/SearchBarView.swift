@@ -35,21 +35,23 @@ class SearchBarView: UIView {
 
         // Настройка кнопки Cancel
         cancelButton.setTitle("Cancel", for: .normal)
+        cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
         cancelButton.alpha = 0  // Изначально скрыта
         cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
         addSubview(cancelButton)
+
         
         // Констрейнты для searchBar и кнопки
-        searchBarWidthConstraint = searchBar.widthAnchor.constraint(equalTo: widthAnchor)  // По умолчанию searchBar на всю ширину
+        searchBarWidthConstraint = searchBar.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.95)
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: topAnchor, constant: 80),
-            searchBar.leadingAnchor.constraint(equalTo: leadingAnchor),
+            searchBar.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
             searchBarWidthConstraint,
             searchBar.bottomAnchor.constraint(equalTo: bottomAnchor),
 
             cancelButton.centerYAnchor.constraint(equalTo: searchBar.centerYAnchor),
-            cancelButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+            cancelButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -25),
             cancelButton.widthAnchor.constraint(equalToConstant: 60),  // Ширина кнопки Cancel
             cancelButton.heightAnchor.constraint(equalToConstant: 30)  // Высота кнопки
         ])
