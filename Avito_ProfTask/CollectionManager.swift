@@ -6,12 +6,27 @@
 //
 import UIKit
 
+// Протокол для делегирования выбора ячейки
+protocol CollectionManagerDelegate: AnyObject {
+    func didSelectImage(_ image: UnsplashImage)
+}
+
 class CollectionManager: NSObject, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
-    var images: [UnsplashImage] = []
+    var images: [UnsplashImage] = [] {
+        didSet {
+            // Фильтруем изображения: исключаем те, у которых нет описания
+            images = images.filter { $0.description != nil }
+        }
+    }
+    
     var isGridMode = true  // По умолчанию режим сетки (два столбца)
+    
+    weak var delegate: CollectionManagerDelegate?
 
     init(images: [UnsplashImage]) {
-        self.images = images
+        super.init()
+        // Устанавливаем отфильтрованные изображения при инициализации
+        self.images = images.filter { $0.description != nil }
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -29,6 +44,13 @@ class CollectionManager: NSObject, UICollectionViewDataSource, UICollectionViewD
         return cell
     }
 
+    // Добавляем обработку нажатия на ячейку
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedImage = images[indexPath.item]
+        delegate?.didSelectImage(selectedImage)
+    }
+
+    // Настройка размеров ячеек
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let padding: CGFloat = 10
         let availableWidth = collectionView.frame.width - padding * 3

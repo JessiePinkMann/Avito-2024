@@ -37,12 +37,19 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
         
         suggestionsManager = SuggestionsManager(tableView: suggestionsTableView, searchBar: searchBarView.searchBar, parentVC: self)
         collectionManager = CollectionManager(images: images)
+        collectionManager.delegate = self  // Устанавливаем делегат
         collectionView.dataSource = collectionManager
         collectionView.delegate = collectionManager
         
         // Добавляем кнопку для сортировки через SortManager
         let sortButton = sortManager.createSortButton(target: self)  // Передаем SearchViewController
         navigationItem.rightBarButtonItem = sortButton
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+        
+        loadingStateView.hide()
         
         // Добавляем кнопку переключения режимов отображения
         let switchButton = UIBarButtonItem(title: "Switch Mode", style: .plain, target: self, action: #selector(toggleLayoutMode))
@@ -65,16 +72,18 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
         NetworkManager.shared.searchImages(query: query, page: currentPage, sortBy: sortBy) { [weak self] result in
             guard let self = self else { return }
             DispatchQueue.main.async {
+                self.loadingStateView.hide()
+                self.isFetchingMore = false
+
                 switch result {
-                case .success(let images):
-                    self.images = images
-                    self.collectionManager.images = images
+                case .success(let fetchedImages):
+                    // Фильтруем изображения без описания
+                    self.images = fetchedImages.filter { $0.description != nil }
+                    self.collectionManager.images = self.images
                     self.collectionView.reloadData()
                 case .failure(let error):
                     print("Error: \(error)")
                 }
-                self.isFetchingMore = false
-                self.loadingStateView.hide()
             }
         }
     }
@@ -202,5 +211,13 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
             let height = width * 0.75  // Примерное соотношение сторон
             return CGSize(width: width, height: height)
         }
+    }
+}
+
+// Реализуем делегат для перехода на детальный экран
+extension SearchViewController: CollectionManagerDelegate {
+    func didSelectImage(_ image: UnsplashImage) {
+        let detailVC = DetailViewController(image: image)
+        navigationController?.pushViewController(detailVC, animated: true)
     }
 }

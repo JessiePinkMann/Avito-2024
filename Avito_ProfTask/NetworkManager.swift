@@ -56,7 +56,7 @@ class NetworkManager {
 
             // Логируем полученные данные
             if let jsonString = String(data: data, encoding: .utf8) {
-                print("Response JSON: \(jsonString)")
+                // print("Response JSON: \(jsonString)")
             }
 
             // Пытаемся декодировать ответ
