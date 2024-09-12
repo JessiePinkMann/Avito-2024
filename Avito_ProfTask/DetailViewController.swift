@@ -14,6 +14,8 @@ class DetailViewController: UIViewController {
     private let imageView = UIImageView()
     private let descriptionLabel = UILabel()
     private let authorLabel = UILabel()
+    private let instagramLabel = UILabel()
+    private let portfolioLabel = UILabel()
     
     // View для кнопок
     private let bottomButtonsView = UIView()
@@ -39,6 +41,82 @@ class DetailViewController: UIViewController {
         setupButtons()
     }
 
+    // Функция для кнопки Share
+    @objc private func shareImage() {
+        guard let imageUrl = URL(string: image.urls.small) else { return }
+        
+        URLSession.shared.dataTask(with: imageUrl) { data, _, error in
+            if let data = data, let imageToShare = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    let activityVC = UIActivityViewController(activityItems: [imageToShare], applicationActivities: nil)
+                    self.present(activityVC, animated: true, completion: nil)
+                }
+            }
+        }.resume()
+    }
+
+    // Функция для кнопки Save
+    @objc private func saveImage() {
+        guard let imageUrl = URL(string: image.urls.small) else { return }
+        
+        URLSession.shared.dataTask(with: imageUrl) { data, _, error in
+            if let data = data, let imageToSave = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    UIImageWriteToSavedPhotosAlbum(imageToSave, self, #selector(self.image(_:didFinishSavingWithError:contextInfo:)), nil)
+                }
+            }
+        }.resume()
+    }
+
+    @objc private func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+        if let error = error {
+            showAlert(title: "Error", message: "Failed to save image: \(error.localizedDescription)")
+        } else {
+            showAlert(title: "Saved", message: "Image has been successfully saved to your gallery.")
+        }
+    }
+
+    @objc private func openPortfolio() {
+        if let portfolioURL = URL(string: image.user.portfolio_url ?? "") {
+            UIApplication.shared.open(portfolioURL, options: [:], completionHandler: nil)
+        }
+    }
+
+    // Функция для отображения алерта
+    private func showAlert(title: String, message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alertController, animated: true, completion: nil)
+    }
+
+    // Функция для настройки информации об авторе
+    private func configure(with image: UnsplashImage) {
+        descriptionLabel.text = image.description ?? "No description available"
+        authorLabel.text = "Author: \(image.user.name)"
+        
+        if let instagramUsername = image.user.instagram_username {
+            instagramLabel.text = "Instagram: @\(instagramUsername)"
+        } else {
+            instagramLabel.isHidden = true
+        }
+        
+        if let portfolio = image.user.portfolio_url {
+            portfolioLabel.text = "Portfolio: \(portfolio)"
+        } else {
+            portfolioLabel.isHidden = true
+        }
+
+        if let url = URL(string: image.urls.small) {
+            URLSession.shared.dataTask(with: url) { data, _, _ in
+                if let data = data {
+                    DispatchQueue.main.async {
+                        self.imageView.image = UIImage(data: data)
+                    }
+                }
+            }.resume()
+        }
+    }
+    
     private func setupViews() {
         // Используем UIScrollView для основного контента
         let scrollView = UIScrollView()
@@ -65,6 +143,22 @@ class DetailViewController: UIViewController {
         authorLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(authorLabel)
 
+        // Настройка Instagram
+        instagramLabel.font = UIFont.systemFont(ofSize: 14)
+        instagramLabel.textColor = .gray // Оставляем стандартный цвет текста
+        instagramLabel.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(instagramLabel)
+
+        // Настройка портфолио (ссылка с легким синим оттенком)
+        portfolioLabel.font = UIFont.systemFont(ofSize: 14)
+        portfolioLabel.textColor = UIColor.systemBlue.withAlphaComponent(0.8)  // Слегка синий цвет для ссылки
+        portfolioLabel.isUserInteractionEnabled = true
+        portfolioLabel.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(portfolioLabel)
+
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(openPortfolio))
+        portfolioLabel.addGestureRecognizer(tapGesture)
+
         // Настройка констрейнтов для скроллируемого контента
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -90,7 +184,15 @@ class DetailViewController: UIViewController {
             authorLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 10),
             authorLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             authorLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            authorLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20)
+
+            instagramLabel.topAnchor.constraint(equalTo: authorLabel.bottomAnchor, constant: 10),
+            instagramLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            instagramLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+
+            portfolioLabel.topAnchor.constraint(equalTo: instagramLabel.bottomAnchor, constant: 10),
+            portfolioLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            portfolioLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            portfolioLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20)
         ])
         
         // View для кнопок внизу экрана
@@ -131,62 +233,5 @@ class DetailViewController: UIViewController {
             saveButton.trailingAnchor.constraint(equalTo: bottomButtonsView.trailingAnchor, constant: -40),
             saveButton.centerYAnchor.constraint(equalTo: bottomButtonsView.centerYAnchor)
         ])
-    }
-
-    // Функция для кнопки Share
-    @objc private func shareImage() {
-        guard let imageUrl = URL(string: image.urls.small) else { return }
-        
-        URLSession.shared.dataTask(with: imageUrl) { data, _, error in
-            if let data = data, let imageToShare = UIImage(data: data) {
-                DispatchQueue.main.async {
-                    let activityVC = UIActivityViewController(activityItems: [imageToShare], applicationActivities: nil)
-                    self.present(activityVC, animated: true, completion: nil)
-                }
-            }
-        }.resume()
-    }
-
-    // Функция для кнопки Save
-    @objc private func saveImage() {
-        guard let imageUrl = URL(string: image.urls.small) else { return }
-        
-        URLSession.shared.dataTask(with: imageUrl) { data, _, error in
-            if let data = data, let imageToSave = UIImage(data: data) {
-                DispatchQueue.main.async {
-                    UIImageWriteToSavedPhotosAlbum(imageToSave, self, #selector(self.image(_:didFinishSavingWithError:contextInfo:)), nil)
-                }
-            }
-        }.resume()
-    }
-
-    @objc private func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
-        if let error = error {
-            showAlert(title: "Error", message: "Failed to save image: \(error.localizedDescription)")
-        } else {
-            showAlert(title: "Saved", message: "Image has been successfully saved to your gallery.")
-        }
-    }
-
-    // Функция для отображения алерта
-    private func showAlert(title: String, message: String) {
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "OK", style: .default))
-        present(alertController, animated: true, completion: nil)
-    }
-    
-    private func configure(with image: UnsplashImage) {
-        descriptionLabel.text = image.description ?? "No description available"
-        authorLabel.text = "Author: \(image.user.name)"
-
-        if let url = URL(string: image.urls.small) {
-            URLSession.shared.dataTask(with: url) { data, _, _ in
-                if let data = data {
-                    DispatchQueue.main.async {
-                        self.imageView.image = UIImage(data: data)
-                    }
-                }
-            }.resume()
-        }
     }
 }

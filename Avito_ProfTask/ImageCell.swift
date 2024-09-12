@@ -2,7 +2,6 @@ import UIKit
 
 class ImageCell: UICollectionViewCell {
 
-    // Элементы UI
     private let imageView = UIImageView()
     private let descriptionLabel = UILabel()
     private let dateLabel = UILabel()
@@ -26,46 +25,6 @@ class ImageCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    private func setupViews() {
-        // Настройка imageView
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = 10
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(imageView)
-
-        // Настройка descriptionLabel
-        descriptionLabel.font = UIFont.systemFont(ofSize: 14)
-        descriptionLabel.numberOfLines = 1
-        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(descriptionLabel)
-
-        // Настройка dateLabel
-        dateLabel.font = UIFont.systemFont(ofSize: 12)
-        dateLabel.textColor = .gray
-        dateLabel.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(dateLabel)
-
-        // Устанавливаем базовые констрейнты для всех элементов
-        NSLayoutConstraint.activate([
-            imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
-            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
-            imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
-            
-            descriptionLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 2),
-            descriptionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
-            descriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
-            
-            dateLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 2),
-            dateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
-            dateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
-            dateLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -5)
-        ])
-
-        // Создаем констрейнт для высоты imageView, который будет меняться
-        imageViewHeightConstraint = imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor)
-        imageViewHeightConstraint.isActive = true
-    }
 
     // Метод для обновления режима отображения
     private func updateLayoutForMode() {
@@ -109,6 +68,47 @@ class ImageCell: UICollectionViewCell {
             return displayFormatter.string(from: date)
         }
         return "Unknown date"
+    }
+    
+    private func setupViews() {
+        // Настройка imageView
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 10
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(imageView)
+
+        // Настройка descriptionLabel
+        descriptionLabel.font = UIFont.systemFont(ofSize: 14)
+        descriptionLabel.numberOfLines = 1
+        descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(descriptionLabel)
+
+        // Настройка dateLabel
+        dateLabel.font = UIFont.systemFont(ofSize: 12)
+        dateLabel.textColor = .gray
+        dateLabel.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(dateLabel)
+
+        // Устанавливаем базовые констрейнты для всех элементов
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
+            imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
+            imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
+            
+            descriptionLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 2),
+            descriptionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
+            descriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
+            
+            dateLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 2),
+            dateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
+            dateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
+            dateLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -5)
+        ])
+
+        // Создаем констрейнт для высоты imageView, который будет меняться
+        imageViewHeightConstraint = imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor)
+        imageViewHeightConstraint.isActive = true
     }
 }
 

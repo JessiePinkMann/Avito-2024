@@ -25,4 +25,6 @@ struct Urls: Decodable {
 
 struct User: Decodable {
     let name: String
+    let portfolio_url: String?
+    let instagram_username: String?
 }
