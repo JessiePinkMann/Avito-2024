@@ -7,18 +7,16 @@
 
 import UIKit
 
-// Добавляем новый case для сортировки по старым изображениям
 enum SortOption: String {
-    case relevant = "Popular"  // Сортировка по релевантности
-    case latest = "Latest"     // Сортировка по новизне
+    case relevant = "Popular"
+    case latest = "Latest"
 }
 
 
 class SortManager {
-    var selectedSortOption: SortOption = .relevant  // Дефолт: Relevant (по умолчанию API)
+    var selectedSortOption: SortOption = .relevant
 
     func createSortButton(target: SearchViewController) -> UIBarButtonItem {
-        // Действия для сортировки
         let relevantAction = UIAction(title: "Sort by Relevant", image: UIImage(systemName: "star.fill")) { _ in
             self.selectedSortOption = .relevant
             target.performSearch(query: target.searchQuery ?? "", sortBy: "relevant")
@@ -29,10 +27,8 @@ class SortManager {
             target.performSearch(query: target.searchQuery ?? "", sortBy: "latest")
         }
 
-        // Создаем меню с опциями сортировки
         let sortMenu = UIMenu(title: "Sort by", options: .displayInline, children: [relevantAction, latestAction])
         
-        // Создаем кнопку для меню сортировки
         let sortButton = UIBarButtonItem(image: UIImage(systemName: "line.horizontal.3.decrease.circle"), menu: sortMenu)
         
         return sortButton

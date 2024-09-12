@@ -33,86 +33,54 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
         super.viewDidLoad()
 
         view.backgroundColor = UIColor(named: "primaryBackground")
-        
+
         setupSearchBarView()
         setupCollectionView()
         setupLoadingStateView()
         setupSuggestionsTableView()
-        
+
+        collectionView.register(PaginationFooterView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: PaginationFooterView.reuseIdentifier)
+        collectionView.register(PaginationFooterView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: PaginationFooterView.reuseIdentifier)
+
         suggestionsManager = SuggestionsManager(tableView: suggestionsTableView, searchBar: searchBarView.searchBar, parentVC: self)
         collectionManager = CollectionManager(images: images)
-        collectionManager.delegate = self  // Устанавливаем делегат
+        collectionManager.delegate = self
         collectionView.dataSource = collectionManager
         collectionView.delegate = collectionManager
-        
-        // Добавляем кнопку для сортировки через SortManager
-        let sortButton = sortManager.createSortButton(target: self)  // Передаем SearchViewController
+
+        let sortButton = sortManager.createSortButton(target: self)
         navigationItem.rightBarButtonItem = sortButton
-        
+
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tapGesture.cancelsTouchesInView = false
         view.addGestureRecognizer(tapGesture)
-        
+
         loadingStateView.hide()
 
         let switchButton = UIBarButtonItem(title: "Switch Mode", style: .plain, target: self, action: #selector(toggleLayoutMode))
         navigationItem.leftBarButtonItem = switchButton
-
-        setupPaginationView()  // Устанавливаем кнопки пагинации
     }
-    
-    private func setupPaginationView() {
-        previousPageButton = UIButton(type: .system)
-        previousPageButton.setTitle("Previous", for: .normal)
-        previousPageButton.addTarget(self, action: #selector(previousPageTapped), for: .touchUpInside)
 
-        nextPageButton = UIButton(type: .system)
-        nextPageButton.setTitle("Next", for: .normal)
-        nextPageButton.addTarget(self, action: #selector(nextPageTapped), for: .touchUpInside)
-
-        pageLabel = UILabel()
-        pageLabel.text = "Page 1"
-        pageLabel.textAlignment = .center
-
-        paginationStackView = UIStackView(arrangedSubviews: [previousPageButton, pageLabel, nextPageButton])
-        paginationStackView.axis = .horizontal
-        paginationStackView.spacing = 10
-        paginationStackView.distribution = .fillEqually
-        paginationStackView.translatesAutoresizingMaskIntoConstraints = false
-
-        view.addSubview(paginationStackView)
-
-        NSLayoutConstraint.activate([
-            paginationStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
-            paginationStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            paginationStackView.heightAnchor.constraint(equalToConstant: 50),
-            paginationStackView.widthAnchor.constraint(equalToConstant: 300)
-        ])
-    }
-    
-    @objc private func toggleLayoutMode() {
-        collectionManager.toggleLayout()
-        collectionView.collectionViewLayout.invalidateLayout()  // Обновляем макет
-        collectionView.reloadData()
-    }
-    
-
-    
-    @objc private func previousPageTapped() {
+    @objc func previousPageTapped() {
         guard currentPage > 1 else { return }
         currentPage -= 1
-        pageLabel.text = "Page \(currentPage)"
         performSearch(query: searchQuery ?? "", sortBy: "relevant")
     }
 
-    @objc private func nextPageTapped() {
+    @objc func nextPageTapped() {
         currentPage += 1
-        pageLabel.text = "Page \(currentPage)"
         performSearch(query: searchQuery ?? "", sortBy: "relevant")
     }
 
     func updatePaginationUI() {
-        previousPageButton.isEnabled = currentPage > 1
+        let footerView = collectionView.supplementaryView(forElementKind: UICollectionView.elementKindSectionFooter, at: IndexPath(item: 0, section: 0)) as? PaginationFooterView
+        footerView?.previousButton.isEnabled = currentPage > 1
+    }
+    
+    @objc private func toggleLayoutMode() {
+        collectionManager.toggleLayout()
+        collectionView.collectionViewLayout.invalidateLayout()
+        collectionView.reloadData()
     }
 
     // MARK: - Выполнение поиска
@@ -130,14 +98,10 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
 
                 switch result {
                 case .success(let fetchedImages):
-                    let filteredImages = fetchedImages.filter { $0.description != nil }
-                    if self.currentPage == 1 {
-                        self.images = filteredImages  // Если первая страница, заменяем изображения
-                    } else {
-                        self.images.append(contentsOf: filteredImages)  // Если следующая страница, добавляем
-                    }
+                    self.images = fetchedImages.filter { $0.description != nil }
                     self.collectionManager.images = self.images
                     self.collectionView.reloadData()
+                    self.collectionView.setContentOffset(.zero, animated: true)
                     self.updatePaginationUI()
                 case .failure(let error):
                     print("Error: \(error)")
@@ -145,6 +109,9 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
             }
         }
     }
+
+
+
     
     // MARK: - UISearchBarDelegate
     
@@ -193,43 +160,43 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
     // MARK: - Networking
     
     private func searchImages(query: String, page: Int) {
-        print("Executing searchImages with query: \(query), page: \(page)")  // Логируем запрос.
+        print("Executing searchImages with query: \(query), page: \(page)")
         
         guard !query.isEmpty else {
             print("Query is empty, aborting request.")
-            return  // Если query пустое, не выполняем запрос.
+            return
         }
         
         loadingStateView.isHidden = false
-        loadingStateView.showLoading()  // Показываем состояние загрузки.
+        loadingStateView.showLoading()
         
         NetworkManager.shared.searchImages(query: query, page: page) { [weak self] result in
             guard let self = self else { return }
             
             DispatchQueue.main.async {
-                self.loadingStateView.hide()  // Скрываем состояние загрузки.
+                self.loadingStateView.hide()
             }
             
             switch result {
             case .success(let images):
                 if images.isEmpty {
                     DispatchQueue.main.async {
-                        self.loadingStateView.isHidden = false  // Показываем, если ничего не найдено.
+                        self.loadingStateView.isHidden = false
                         self.loadingStateView.showNoContent()
                     }
                 } else {
                     DispatchQueue.main.async {
                         self.images.append(contentsOf: images)
-                        self.collectionManager.images = self.images  // Обновляем данные в CollectionViewManager
+                        self.collectionManager.images = self.images
                         self.collectionView.reloadData()
-                        self.loadingStateView.isHidden = true  // Скрываем все состояния, когда есть данные.
+                        self.loadingStateView.isHidden = true
                     }
                 }
             case .failure(let error):
-                print("Network error: \(error.localizedDescription)")  // Логируем ошибку.
+                print("Network error: \(error.localizedDescription)")
                 DispatchQueue.main.async {
-                    self.loadingStateView.showError(error.localizedDescription)  // Показываем ошибку.
-                    self.loadingStateView.isHidden = false  // Показываем ошибку.
+                    self.loadingStateView.showError(error.localizedDescription)
+                    self.loadingStateView.isHidden = false
                 }
             }
         }
@@ -238,7 +205,7 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
     // MARK: - UICollectionViewDataSource
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return images.count  // Количество элементов
+        return images.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -247,7 +214,6 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
         }
 
         let image = images[indexPath.item]
-        // Передаем режим отображения в ячейку через isGridMode
         cell.configure(with: image, isSingleColumnMode: !collectionManager.isGridMode)
         return cell
     }
@@ -259,20 +225,17 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let padding: CGFloat = 10
 
-        if collectionManager.isGridMode {  // Проверяем, включен ли режим сетки
-            // Режим двух плиток
+        if collectionManager.isGridMode {
             let width = (view.frame.width - padding * 3) / 2
             return CGSize(width: width, height: width)
         } else {
-            // Устанавливаем одну плитку во всю ширину экрана с учётом отступов
             let width = view.frame.width - padding * 2
-            let height = width * 0.75  // Примерное соотношение сторон
+            let height = width * 0.75
             return CGSize(width: width, height: height)
         }
     }
 }
 
-// Реализуем делегат для перехода на детальный экран
 extension SearchViewController: CollectionManagerDelegate {
     func didSelectImage(_ image: UnsplashImage) {
         let detailVC = DetailViewController(image: image)

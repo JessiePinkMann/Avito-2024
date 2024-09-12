@@ -16,23 +16,21 @@ class NetworkManager {
     static let shared = NetworkManager()
 
     private let baseURL = "https://api.unsplash.com/search/photos"
-    private let accessKey = "Mo1EuSZ2I4Ek0-zfkyjTCYfxtU5N8L0j_qF3ZuCrIr0"  // Вставь сюда свой ключ API
+    private let accessKey = "Mo1EuSZ2I4Ek0-zfkyjTCYfxtU5N8L0j_qF3ZuCrIr0"
 
     private init() {}
 
-    // Добавляем параметр сортировки как строку
     func searchImages(query: String, page: Int = 1, sortBy: String = "relevant", completion: @escaping (Result<[UnsplashImage], NetworkError>) -> Void) {
         guard var urlComponents = URLComponents(string: baseURL) else {
             completion(.failure(.invalidURL))
             return
         }
 
-        // Формируем параметры запроса с правильным параметром сортировки
         urlComponents.queryItems = [
             URLQueryItem(name: "query", value: query),
             URLQueryItem(name: "page", value: "\(page)"),
             URLQueryItem(name: "per_page", value: "30"),
-            URLQueryItem(name: "order_by", value: sortBy),  // Либо "relevant", либо "latest"
+            URLQueryItem(name: "order_by", value: sortBy),
             URLQueryItem(name: "client_id", value: accessKey)
         ]
 
@@ -54,12 +52,10 @@ class NetworkManager {
                 return
             }
 
-            // Логируем полученные данные
-            if let jsonString = String(data: data, encoding: .utf8) {
-                // print("Response JSON: \(jsonString)")
-            }
+//            if let jsonString = String(data: data, encoding: .utf8) {
+//                 print("Response JSON: \(jsonString)")
+//            }
 
-            // Пытаемся декодировать ответ
             do {
                 let result = try JSONDecoder().decode(SearchResult.self, from: data)
                 completion(.success(result.results))

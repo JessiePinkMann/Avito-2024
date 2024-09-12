@@ -6,14 +6,12 @@ class ImageCell: UICollectionViewCell {
     private let descriptionLabel = UILabel()
     private let dateLabel = UILabel()
 
-    // Проперти для отслеживания режима
     var isSingleColumnMode = false {
         didSet {
             updateLayoutForMode()
         }
     }
 
-    // Констрейнт для высоты картинки
     private var imageViewHeightConstraint: NSLayoutConstraint!
 
     override init(frame: CGRect) {
@@ -25,22 +23,17 @@ class ImageCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-
-    // Метод для обновления режима отображения
     private func updateLayoutForMode() {
-        // Убираем активный constraint перед переключением
         imageViewHeightConstraint.isActive = false
 
         if isSingleColumnMode {
-            // В режиме одной колонки высота фиксируется на 200
             imageViewHeightConstraint = imageView.heightAnchor.constraint(equalToConstant: 200)
         } else {
-            // В режиме двух колонок высота = ширина (квадрат)
             imageViewHeightConstraint = imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor)
         }
 
         imageViewHeightConstraint.isActive = true
-        layoutIfNeeded()  // Применяем изменения
+        layoutIfNeeded()
     }
 
     func configure(with image: UnsplashImage, isSingleColumnMode: Bool) {
@@ -71,26 +64,22 @@ class ImageCell: UICollectionViewCell {
     }
     
     private func setupViews() {
-        // Настройка imageView
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 10
         imageView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(imageView)
 
-        // Настройка descriptionLabel
         descriptionLabel.font = UIFont.systemFont(ofSize: 14)
         descriptionLabel.numberOfLines = 1
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(descriptionLabel)
 
-        // Настройка dateLabel
         dateLabel.font = UIFont.systemFont(ofSize: 12)
         dateLabel.textColor = .gray
         dateLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(dateLabel)
 
-        // Устанавливаем базовые констрейнты для всех элементов
         NSLayoutConstraint.activate([
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
             imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
@@ -106,7 +95,6 @@ class ImageCell: UICollectionViewCell {
             dateLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -5)
         ])
 
-        // Создаем констрейнт для высоты imageView, который будет меняться
         imageViewHeightConstraint = imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor)
         imageViewHeightConstraint.isActive = true
     }

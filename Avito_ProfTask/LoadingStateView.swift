@@ -32,7 +32,6 @@ class LoadingStateView: UIView {
             messageLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
         ])
         
-        // Изначально скрываем сообщение
         hide()
     }
     
@@ -52,7 +51,7 @@ class LoadingStateView: UIView {
     }
     
     func hide() {
-        messageLabel.text = ""  // Очищаем текст
+        messageLabel.text = ""
         self.isHidden = true
     }
 }

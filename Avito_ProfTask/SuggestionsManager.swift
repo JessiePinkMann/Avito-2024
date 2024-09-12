@@ -12,7 +12,7 @@ class SuggestionsManager: NSObject, UITableViewDataSource, UITableViewDelegate {
     private var suggestions: [String] = []
     private var tableView: UITableView
     private var searchBar: UISearchBar
-    private weak var parentVC: SearchViewController?  // Ссылка на контроллер
+    private weak var parentVC: SearchViewController?
 
     init(tableView: UITableView, searchBar: UISearchBar, parentVC: SearchViewController) {
         self.tableView = tableView
@@ -24,7 +24,6 @@ class SuggestionsManager: NSObject, UITableViewDataSource, UITableViewDelegate {
         self.tableView.delegate = self
     }
 
-    // Фильтрация истории поиска
     func filterSuggestions(for query: String) {
         suggestions = HistoryManager.shared.filteredHistory(for: query)
         tableView.reloadData()
@@ -32,14 +31,12 @@ class SuggestionsManager: NSObject, UITableViewDataSource, UITableViewDelegate {
         updateSuggestionsTableViewHeight()
     }
 
-    // Очистка таблицы
     func clearSuggestions() {
         suggestions.removeAll()
         tableView.reloadData()
         tableView.isHidden = true
     }
 
-    // Обновляем высоту таблицы в зависимости от количества элементов
     private func updateSuggestionsTableViewHeight() {
         let maxVisibleRows = 5
         let rowHeight: CGFloat = 44

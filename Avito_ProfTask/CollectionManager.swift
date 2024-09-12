@@ -6,26 +6,26 @@
 //
 import UIKit
 
-// Протокол для делегирования выбора ячейки
 protocol CollectionManagerDelegate: AnyObject {
     func didSelectImage(_ image: UnsplashImage)
+    var currentPage: Int { get }
 }
 
+import UIKit
+
 class CollectionManager: NSObject, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    weak var delegate: CollectionManagerDelegate?
+
     var images: [UnsplashImage] = [] {
         didSet {
-            // Фильтруем изображения: исключаем те, у которых нет описания
             images = images.filter { $0.description != nil }
         }
     }
     
-    var isGridMode = true  // По умолчанию режим сетки (два столбца)
-    
-    weak var delegate: CollectionManagerDelegate?
+    var isGridMode = true
 
     init(images: [UnsplashImage]) {
         super.init()
-        // Устанавливаем отфильтрованные изображения при инициализации
         self.images = images.filter { $0.description != nil }
     }
 
@@ -39,33 +39,58 @@ class CollectionManager: NSObject, UICollectionViewDataSource, UICollectionViewD
         }
 
         let image = images[indexPath.item]
-        // Передаем режим отображения в ячейку через isGridMode
         cell.configure(with: image, isSingleColumnMode: !isGridMode)
         return cell
     }
 
-    // Добавляем обработку нажатия на ячейку
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedImage = images[indexPath.item]
         delegate?.didSelectImage(selectedImage)
     }
 
-    // Настройка размеров ячеек
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let padding: CGFloat = 10
         let availableWidth = collectionView.frame.width - padding * 3
 
         if isGridMode {
-            // Режим сетки: два столбца
             let width = availableWidth / 2
             return CGSize(width: width, height: width * 1.5)
         } else {
-            // Режим одного столбца
             return CGSize(width: availableWidth, height: availableWidth * 0.75)
+        }
+    }
+
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        switch kind {
+        case UICollectionView.elementKindSectionHeader:
+            let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: PaginationFooterView.reuseIdentifier, for: indexPath) as! PaginationFooterView
+
+            headerView.previousButton.addTarget(delegate, action: #selector(SearchViewController.previousPageTapped), for: .touchUpInside)
+            headerView.nextButton.addTarget(delegate, action: #selector(SearchViewController.nextPageTapped), for: .touchUpInside)
+            headerView.pageLabel.text = "Page \(delegate?.currentPage ?? 1)"
+            return headerView
+        case UICollectionView.elementKindSectionFooter:
+            let footerView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: PaginationFooterView.reuseIdentifier, for: indexPath) as! PaginationFooterView
+
+            footerView.previousButton.addTarget(delegate, action: #selector(SearchViewController.previousPageTapped), for: .touchUpInside)
+            footerView.nextButton.addTarget(delegate, action: #selector(SearchViewController.nextPageTapped), for: .touchUpInside)
+            footerView.pageLabel.text = "Page \(delegate?.currentPage ?? 1)"
+            return footerView
+        default:
+            fatalError("Unexpected element kind")
         }
     }
 
     func toggleLayout() {
         isGridMode.toggle()
     }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return images.isEmpty ? CGSize.zero : CGSize(width: collectionView.frame.width, height: 50)
+    }
+
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+        return images.isEmpty ? CGSize.zero : CGSize(width: collectionView.frame.width, height: 50)
+    }
+
 }

@@ -17,12 +17,10 @@ class DetailViewController: UIViewController {
     private let instagramLabel = UILabel()
     private let portfolioLabel = UILabel()
     
-    // View для кнопок
     private let bottomButtonsView = UIView()
     private let shareButton = UIButton(type: .system)
     private let saveButton = UIButton(type: .system)
 
-    // Инициализация с изображением
     init(image: UnsplashImage) {
         self.image = image
         super.init(nibName: nil, bundle: nil)
@@ -41,7 +39,6 @@ class DetailViewController: UIViewController {
         setupButtons()
     }
 
-    // Функция для кнопки Share
     @objc private func shareImage() {
         guard let imageUrl = URL(string: image.urls.small) else { return }
         
@@ -55,7 +52,6 @@ class DetailViewController: UIViewController {
         }.resume()
     }
 
-    // Функция для кнопки Save
     @objc private func saveImage() {
         guard let imageUrl = URL(string: image.urls.small) else { return }
         
@@ -82,14 +78,12 @@ class DetailViewController: UIViewController {
         }
     }
 
-    // Функция для отображения алерта
     private func showAlert(title: String, message: String) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "OK", style: .default))
         present(alertController, animated: true, completion: nil)
     }
 
-    // Функция для настройки информации об авторе
     private func configure(with image: UnsplashImage) {
         descriptionLabel.text = image.description ?? "No description available"
         authorLabel.text = "Author: \(image.user.name)"
@@ -118,7 +112,6 @@ class DetailViewController: UIViewController {
     }
     
     private func setupViews() {
-        // Используем UIScrollView для основного контента
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(scrollView)
@@ -143,15 +136,13 @@ class DetailViewController: UIViewController {
         authorLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(authorLabel)
 
-        // Настройка Instagram
         instagramLabel.font = UIFont.systemFont(ofSize: 14)
-        instagramLabel.textColor = .gray // Оставляем стандартный цвет текста
+        instagramLabel.textColor = .gray
         instagramLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(instagramLabel)
 
-        // Настройка портфолио (ссылка с легким синим оттенком)
         portfolioLabel.font = UIFont.systemFont(ofSize: 14)
-        portfolioLabel.textColor = UIColor.systemBlue.withAlphaComponent(0.8)  // Слегка синий цвет для ссылки
+        portfolioLabel.textColor = UIColor.systemBlue.withAlphaComponent(0.8)
         portfolioLabel.isUserInteractionEnabled = true
         portfolioLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(portfolioLabel)
@@ -159,12 +150,11 @@ class DetailViewController: UIViewController {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(openPortfolio))
         portfolioLabel.addGestureRecognizer(tapGesture)
 
-        // Настройка констрейнтов для скроллируемого контента
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -60),  // Оставляем место для кнопок
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -60),
             
             contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
@@ -195,7 +185,6 @@ class DetailViewController: UIViewController {
             portfolioLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20)
         ])
         
-        // View для кнопок внизу экрана
         bottomButtonsView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(bottomButtonsView)
 
@@ -211,7 +200,6 @@ class DetailViewController: UIViewController {
         bottomButtonsView.addSubview(shareButton)
         bottomButtonsView.addSubview(saveButton)
 
-        // Настройка стиля кнопок
         shareButton.setTitle("Share", for: .normal)
         shareButton.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
         shareButton.tintColor = .systemBlue
@@ -222,7 +210,6 @@ class DetailViewController: UIViewController {
         saveButton.tintColor = .systemBlue
         saveButton.addTarget(self, action: #selector(saveImage), for: .touchUpInside)
 
-        // Настройка констрейнтов для кнопок
         shareButton.translatesAutoresizingMaskIntoConstraints = false
         saveButton.translatesAutoresizingMaskIntoConstraints = false
 

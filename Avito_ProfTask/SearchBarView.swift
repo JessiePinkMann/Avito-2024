@@ -7,12 +7,11 @@
 
 import UIKit
 
-// Кастомный класс для UISearchBar с анимацией и кнопкой Cancel
 class SearchBarView: UIView {
     
     let searchBar = UISearchBar()
-    private let cancelButton = UIButton(type: .system)  // Кнопка Cancel
-    private var searchBarWidthConstraint: NSLayoutConstraint!  // Констрейнт для изменения ширины SearchBar
+    private let cancelButton = UIButton(type: .system)
+    private var searchBarWidthConstraint: NSLayoutConstraint!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -27,9 +26,9 @@ class SearchBarView: UIView {
     private func setupView() {
         backgroundColor = .clear
         
-        // Настройка searchBar
+
         searchBar.translatesAutoresizingMaskIntoConstraints = false
-        searchBar.searchBarStyle = .minimal  // Без лишних фонов
+        searchBar.searchBarStyle = .minimal
         searchBar.placeholder = "Search images..."
         addSubview(searchBar)
 
@@ -37,12 +36,11 @@ class SearchBarView: UIView {
         cancelButton.setTitle("Cancel", for: .normal)
         cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         cancelButton.translatesAutoresizingMaskIntoConstraints = false
-        cancelButton.alpha = 0  // Изначально скрыта
+        cancelButton.alpha = 0
         cancelButton.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
         addSubview(cancelButton)
 
         
-        // Констрейнты для searchBar и кнопки
         searchBarWidthConstraint = searchBar.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.95)
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: topAnchor, constant: 80),
@@ -52,27 +50,25 @@ class SearchBarView: UIView {
 
             cancelButton.centerYAnchor.constraint(equalTo: searchBar.centerYAnchor),
             cancelButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -25),
-            cancelButton.widthAnchor.constraint(equalToConstant: 60),  // Ширина кнопки Cancel
-            cancelButton.heightAnchor.constraint(equalToConstant: 30)  // Высота кнопки
+            cancelButton.widthAnchor.constraint(equalToConstant: 60),
+            cancelButton.heightAnchor.constraint(equalToConstant: 30)
         ])
     }
     
     // MARK: - Показ кнопки Cancel с анимацией
 
     func activateSearch() {
-        // Анимация для изменения ширины searchBar и показа кнопки
         UIView.animate(withDuration: 0.3) { [weak self] in
             guard let self = self else { return }
-            self.searchBarWidthConstraint.constant = -80  // Уменьшаем ширину SearchBar для показа кнопки Cancel
-            self.cancelButton.alpha = 1  // Показываем кнопку Cancel
-            self.layoutIfNeeded()  // Применяем изменения
+            self.searchBarWidthConstraint.constant = -80
+            self.cancelButton.alpha = 1
+            self.layoutIfNeeded()
         }
     }
     
     // MARK: - Сброс поисковой строки и скрытие Cancel
 
     @objc func cancelButtonTapped() {
-        // Вызов метода отмены в контроллере
         if let parentVC = parentViewController as? SearchViewController {
             parentVC.cancelSearch()
         }
@@ -80,18 +76,16 @@ class SearchBarView: UIView {
 
 
     func cancelSearch() {
-        // Очистка текста и возврат к исходному состоянию
         searchBar.text = ""
         
-        // Анимация для возврата SearchBar к полной ширине и скрытия кнопки Cancel
         UIView.animate(withDuration: 0.3) { [weak self] in
             guard let self = self else { return }
-            self.searchBarWidthConstraint.constant = 0  // Восстанавливаем полную ширину SearchBar
-            self.cancelButton.alpha = 0  // Скрываем кнопку Cancel
-            self.layoutIfNeeded()  // Применяем изменения
+            self.searchBarWidthConstraint.constant = 0
+            self.cancelButton.alpha = 0
+            self.layoutIfNeeded()
         }
         
-        searchBar.resignFirstResponder()  // Закрываем клавиатуру
+        searchBar.resignFirstResponder()
     }
 }
 
