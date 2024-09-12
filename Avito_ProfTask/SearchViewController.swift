@@ -9,21 +9,25 @@
 import UIKit
 
 class SearchViewController: UIViewController, UISearchBarDelegate {
-    
+
     var collectionView: UICollectionView!
     var searchBarView: SearchBarView!
     var loadingStateView: LoadingStateView!
     var suggestionsTableView: UITableView!
-    
+    var paginationStackView: UIStackView!
+    var previousPageButton: UIButton!
+    var nextPageButton: UIButton!
+    var pageLabel: UILabel!
+
     var images: [UnsplashImage] = []
     var currentPage = 1
     var isFetchingMore = false
-    var searchQuery: String? = nil  // Добавляем сюда свойство searchQuery
-    
+    var searchQuery: String? = nil
+
     var collectionManager: CollectionManager!
     var suggestionsManager: SuggestionsManager!
-    
-    private let sortManager = SortManager()  // Менеджер сортировки
+
+    private let sortManager = SortManager()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,10 +54,40 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
         view.addGestureRecognizer(tapGesture)
         
         loadingStateView.hide()
-        
-        // Добавляем кнопку переключения режимов отображения
+
         let switchButton = UIBarButtonItem(title: "Switch Mode", style: .plain, target: self, action: #selector(toggleLayoutMode))
         navigationItem.leftBarButtonItem = switchButton
+
+        setupPaginationView()  // Устанавливаем кнопки пагинации
+    }
+    
+    private func setupPaginationView() {
+        previousPageButton = UIButton(type: .system)
+        previousPageButton.setTitle("Previous", for: .normal)
+        previousPageButton.addTarget(self, action: #selector(previousPageTapped), for: .touchUpInside)
+
+        nextPageButton = UIButton(type: .system)
+        nextPageButton.setTitle("Next", for: .normal)
+        nextPageButton.addTarget(self, action: #selector(nextPageTapped), for: .touchUpInside)
+
+        pageLabel = UILabel()
+        pageLabel.text = "Page 1"
+        pageLabel.textAlignment = .center
+
+        paginationStackView = UIStackView(arrangedSubviews: [previousPageButton, pageLabel, nextPageButton])
+        paginationStackView.axis = .horizontal
+        paginationStackView.spacing = 10
+        paginationStackView.distribution = .fillEqually
+        paginationStackView.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(paginationStackView)
+
+        NSLayoutConstraint.activate([
+            paginationStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
+            paginationStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            paginationStackView.heightAnchor.constraint(equalToConstant: 50),
+            paginationStackView.widthAnchor.constraint(equalToConstant: 300)
+        ])
     }
     
     @objc private func toggleLayoutMode() {
@@ -64,8 +98,27 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
     
 
     
+    @objc private func previousPageTapped() {
+        guard currentPage > 1 else { return }
+        currentPage -= 1
+        pageLabel.text = "Page \(currentPage)"
+        performSearch(query: searchQuery ?? "", sortBy: "relevant")
+    }
+
+    @objc private func nextPageTapped() {
+        currentPage += 1
+        pageLabel.text = "Page \(currentPage)"
+        performSearch(query: searchQuery ?? "", sortBy: "relevant")
+    }
+
+    func updatePaginationUI() {
+        previousPageButton.isEnabled = currentPage > 1
+    }
+
+    // MARK: - Выполнение поиска
+
     func performSearch(query: String, sortBy: String = "relevant") {
-        guard !isFetchingMore else { return }  // Не повторяем запрос, если идет загрузка данных
+        guard !isFetchingMore else { return }
         isFetchingMore = true
         loadingStateView.showLoading()
 
@@ -77,10 +130,15 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
 
                 switch result {
                 case .success(let fetchedImages):
-                    // Фильтруем изображения без описания
-                    self.images = fetchedImages.filter { $0.description != nil }
+                    let filteredImages = fetchedImages.filter { $0.description != nil }
+                    if self.currentPage == 1 {
+                        self.images = filteredImages  // Если первая страница, заменяем изображения
+                    } else {
+                        self.images.append(contentsOf: filteredImages)  // Если следующая страница, добавляем
+                    }
                     self.collectionManager.images = self.images
                     self.collectionView.reloadData()
+                    self.updatePaginationUI()
                 case .failure(let error):
                     print("Error: \(error)")
                 }
@@ -113,8 +171,8 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
         collectionView.reloadData()
         currentPage = 1
         searchQuery = query
-        
-        searchImages(query: query, page: currentPage)
+
+        performSearch(query: query, sortBy: "relevant")
         searchBar.resignFirstResponder()
         
         suggestionsManager.clearSuggestions()

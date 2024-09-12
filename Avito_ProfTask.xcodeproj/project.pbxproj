@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4F0CDB552C935A3B00B78EC9 /* PaginationFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F0CDB542C935A3B00B78EC9 /* PaginationFooterView.swift */; };
 		4FEB01EB2C90FC1C0022E21D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FEB01EA2C90FC1C0022E21D /* AppDelegate.swift */; };
 		4FEB01ED2C90FC1C0022E21D /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FEB01EC2C90FC1C0022E21D /* SceneDelegate.swift */; };
 		4FEB01F42C90FC1E0022E21D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4FEB01F32C90FC1E0022E21D /* Assets.xcassets */; };
@@ -25,6 +26,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		4F0CDB542C935A3B00B78EC9 /* PaginationFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaginationFooterView.swift; sourceTree = "<group>"; };
 		4FEB01E72C90FC1C0022E21D /* Avito_ProfTask.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Avito_ProfTask.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FEB01EA2C90FC1C0022E21D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		4FEB01EC2C90FC1C0022E21D /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -81,6 +83,7 @@
 				4FEB02002C91010A0022E21D /* SearchViewController.swift */,
 				4FEB02182C9239B10022E21D /* CollectionManager.swift */,
 				4FEB021A2C927B0C0022E21D /* SortManager.swift */,
+				4F0CDB542C935A3B00B78EC9 /* PaginationFooterView.swift */,
 				4FEB02142C9231320022E21D /* SuggestionsManager.swift */,
 				4FEB02162C9232A70022E21D /* SearchViewController+UI.swift */,
 				4FEB020C2C91FD050022E21D /* SearchBarView.swift */,
@@ -168,6 +171,7 @@
 				4FEB01EB2C90FC1C0022E21D /* AppDelegate.swift in Sources */,
 				4FEB021B2C927B0C0022E21D /* SortManager.swift in Sources */,
 				4FEB02032C9101230022E21D /* NetworkManager.swift in Sources */,
+				4F0CDB552C935A3B00B78EC9 /* PaginationFooterView.swift in Sources */,
 				4FEB02012C91010A0022E21D /* SearchViewController.swift in Sources */,
 				4FEB02172C9232A70022E21D /* SearchViewController+UI.swift in Sources */,
 				4FEB02152C9231320022E21D /* SuggestionsManager.swift in Sources */,
