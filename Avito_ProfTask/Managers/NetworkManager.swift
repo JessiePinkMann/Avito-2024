@@ -12,6 +12,7 @@ enum NetworkError: Error {
     case requestFailed
     case decodingFailed
 }
+
 class NetworkManager {
     static let shared = NetworkManager()
 
@@ -19,6 +20,13 @@ class NetworkManager {
     private let accessKey = "Mo1EuSZ2I4Ek0-zfkyjTCYfxtU5N8L0j_qF3ZuCrIr0"
 
     private init() {}
+
+    private let session: URLSession = {
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 10
+        config.timeoutIntervalForResource = 10
+        return URLSession(configuration: config)
+    }()
 
     func searchImages(query: String, page: Int = 1, sortBy: String = "relevant", completion: @escaping (Result<[UnsplashImage], NetworkError>) -> Void) {
         guard var urlComponents = URLComponents(string: baseURL) else {
@@ -39,7 +47,7 @@ class NetworkManager {
             return
         }
 
-        URLSession.shared.dataTask(with: url) { data, response, error in
+        session.dataTask(with: url) { data, response, error in
             if let error = error {
                 completion(.failure(.requestFailed))
                 print("Request failed with error: \(error.localizedDescription)")
@@ -51,10 +59,6 @@ class NetworkManager {
                 print("No data received from server")
                 return
             }
-
-//            if let jsonString = String(data: data, encoding: .utf8) {
-//                 print("Response JSON: \(jsonString)")
-//            }
 
             do {
                 let result = try JSONDecoder().decode(SearchResult.self, from: data)

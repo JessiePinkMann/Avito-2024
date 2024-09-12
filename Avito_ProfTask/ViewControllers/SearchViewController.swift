@@ -90,6 +90,8 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
         isFetchingMore = true
         loadingStateView.showLoading()
 
+        collectionView.isHidden = true
+
         NetworkManager.shared.searchImages(query: query, page: currentPage, sortBy: sortBy) { [weak self] result in
             guard let self = self else { return }
             DispatchQueue.main.async {
@@ -98,20 +100,33 @@ class SearchViewController: UIViewController, UISearchBarDelegate {
 
                 switch result {
                 case .success(let fetchedImages):
-                    self.images = fetchedImages.filter { $0.description != nil }
-                    self.collectionManager.images = self.images
-                    self.collectionView.reloadData()
-                    self.collectionView.setContentOffset(.zero, animated: true)
-                    self.updatePaginationUI()
+                    if fetchedImages.isEmpty {
+                        self.loadingStateView.showNoContent()
+                        self.collectionView.isHidden = true
+                    } else {
+                        self.images = fetchedImages.filter { $0.description != nil }
+                        self.collectionManager.images = self.images
+                        self.collectionView.reloadData()
+                        self.collectionView.isHidden = false
+                        self.collectionView.setContentOffset(.zero, animated: true)
+                        self.updatePaginationUI()
+                    }
                 case .failure(let error):
+                    switch error {
+                    case .requestFailed:
+                        self.loadingStateView.showError("Network error: Please check your internet connection.")
+                    case .invalidURL:
+                        self.loadingStateView.showError("Invalid URL error: Unable to reach server.")
+                    case .decodingFailed:
+                        self.loadingStateView.showError("Decoding error: Unable to process server response.")
+                    }
+
+                    self.collectionView.isHidden = true
                     print("Error: \(error)")
                 }
             }
         }
     }
-
-
-
     
     // MARK: - UISearchBarDelegate
     

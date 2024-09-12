@@ -62,7 +62,6 @@
 			children = (
 				4FEB01EC2C90FC1C0022E21D /* SceneDelegate.swift */,
 				4FEB01EA2C90FC1C0022E21D /* AppDelegate.swift */,
-				4FEB01F82C90FC1E0022E21D /* Info.plist */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -141,6 +140,7 @@
 				4F0CDB572C93740600B78EC9 /* Managers */,
 				4F0CDB562C9373EF00B78EC9 /* App */,
 				4FEB01F32C90FC1E0022E21D /* Assets.xcassets */,
+				4FEB01F82C90FC1E0022E21D /* Info.plist */,
 			);
 			path = Avito_ProfTask;
 			sourceTree = "<group>";
